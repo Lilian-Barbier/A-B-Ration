@@ -11,7 +11,10 @@ public class HandMovement : MonoBehaviour
     void Start()
     {
         InputManager.Instance.inputActions.Actions.A.performed += ctx => isMoving = true;
-        InputManager.Instance.inputActions.Actions.A.cancelled += ctx => isMoving = false;
+        InputManager.Instance.inputActions.Actions.A.canceled += ctx => {
+            isMoving = false;
+            speed *= -1;
+        };
     }
 
     void Update()
@@ -21,4 +24,5 @@ public class HandMovement : MonoBehaviour
             transform.position += speed * Time.deltaTime * Vector3.right;
         }
     }
+
 }
