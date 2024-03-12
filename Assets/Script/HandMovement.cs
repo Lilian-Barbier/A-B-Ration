@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class HandMovement : MonoBehaviour
@@ -11,7 +9,8 @@ public class HandMovement : MonoBehaviour
     void Start()
     {
         InputManager.Instance.inputActions.Actions.A.performed += ctx => isMoving = true;
-        InputManager.Instance.inputActions.Actions.A.canceled += ctx => {
+        InputManager.Instance.inputActions.Actions.A.canceled += ctx =>
+        {
             isMoving = false;
             speed *= -1;
         };
@@ -19,7 +18,7 @@ public class HandMovement : MonoBehaviour
 
     void Update()
     {
-        if (isMoving)
+        if (isMoving && !InputManager.Instance.alreadyCut)
         {
             transform.position += speed * Time.deltaTime * Vector3.right;
         }
