@@ -9,7 +9,8 @@ public class InputManager : Singleton<InputManager>
     {
         WaitingForCut,
         Cutting,
-        WaitingForNexLevel
+        WaitingInputToLoadNextLevel,
+        WaitingAnimationNextLevel
     }
 
     public States currentState = States.WaitingForCut;

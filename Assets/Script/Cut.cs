@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using TMPro;
@@ -13,8 +12,8 @@ public class Cut : MonoBehaviour
     [SerializeField] private WeightValueControls balance1;
     [SerializeField] private WeightValueControls balance2;
 
-    [SerializeField] private TextMeshProUGUI percentLeft;
-    [SerializeField] private TextMeshProUGUI percentRight;
+    [SerializeField] private NumberValueAnimationUI percentLeft;
+    [SerializeField] private NumberValueAnimationUI percentRight;
 
     [SerializeField] private PlayableDirector directorScore;
 
@@ -28,6 +27,14 @@ public class Cut : MonoBehaviour
         {
             if (InputManager.Instance.currentState != InputManager.States.Cutting)
             {
+                var animator = GetComponent<Animator>();
+                animator.SetTrigger("PrepareCutting");
+            }
+        };
+        InputManager.Instance.inputActions.Actions.B.canceled += ctx =>
+        {
+            if (InputManager.Instance.currentState != InputManager.States.Cutting)
+            {
                 Cuting();
             }
         };
@@ -35,8 +42,8 @@ public class Cut : MonoBehaviour
 
     public void Reset()
     {
-        percentLeft.text = "";
-        percentRight.text = "";
+        percentLeft.hideValue = true;
+        percentRight.hideValue = true;
         partLeft.enabled = false;
         partRight.enabled = false;
     }
@@ -45,7 +52,10 @@ public class Cut : MonoBehaviour
     {
         var animator = GetComponent<Animator>();
         animator.SetTrigger("Cutting");
+    }
 
+    void CutWhenAnimationEnds()
+    {
         GameObject cuttableObject = GameObject.FindWithTag("Cuttable");
 
         var spriteRenderer = cuttableObject.GetComponent<SpriteRenderer>();
@@ -61,7 +71,6 @@ public class Cut : MonoBehaviour
 
     IEnumerator StartAnimation()
     {
-        yield return new WaitForSeconds(timeWaitingAnimation);
         directorScore.Play();
 
         yield return new WaitForSeconds((float)directorScore.duration + 0.1f);
@@ -81,14 +90,27 @@ public class Cut : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        percentLeft.text = (leftMass * 100 / (leftMass + rightMass)).ToString() + "%";
-        percentRight.text = (rightMass * 100 / (leftMass + rightMass)).ToString() + "%";
+        int percentLeftValue = leftMass * 100 / (leftMass + rightMass);
+        int percentRightValue = rightMass * 100 / (leftMass + rightMass);
 
-        InputManager.Instance.currentState = InputManager.States.WaitingForNexLevel;
+        percentLeft.hideValue = false;
+        percentRight.hideValue = false;
+        percentLeft.numberValue = percentLeftValue;
+        percentRight.numberValue = percentRightValue;
+        percentLeft.StartAnimation();
+        percentRight.StartAnimation();
+
+        FindAnyObjectByType<GameManager>().CalculateScore(percentLeftValue, percentRightValue, leftMass, rightMass);
+
+        InputManager.Instance.currentState = InputManager.States.WaitingInputToLoadNextLevel;
 
         //Reset animation
         var animator = GetComponent<Animator>();
         animator.SetBool("Cutting", false);
+    }
+
+    void ShakeScreen(){
+        CameraShake.Instance.BigShake();
     }
 
 }
