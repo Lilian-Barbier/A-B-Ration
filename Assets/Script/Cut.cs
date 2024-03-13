@@ -17,6 +17,9 @@ public class Cut : MonoBehaviour
 
     [SerializeField] private PlayableDirector directorScore;
 
+    [SerializeField] private AudioClip prepareCuttingSound;
+    [SerializeField] private AudioClip impactSound;
+
     private int leftMass;
     private int rightMass;
 
@@ -27,8 +30,10 @@ public class Cut : MonoBehaviour
         {
             if (InputManager.Instance.currentState != InputManager.States.Cutting)
             {
-                var animator = GetComponent<Animator>();
-                animator.SetTrigger("PrepareCutting");
+                GetComponent<Animator>().SetTrigger("PrepareCutting");
+                var audioSource = GetComponent<AudioSource>();
+                audioSource.clip = prepareCuttingSound;
+                audioSource.Play();
             }
         };
         InputManager.Instance.inputActions.Actions.B.canceled += ctx =>
@@ -50,8 +55,7 @@ public class Cut : MonoBehaviour
 
     void Cuting()
     {
-        var animator = GetComponent<Animator>();
-        animator.SetTrigger("Cutting");
+        GetComponent<Animator>().SetTrigger("Cutting");
     }
 
     void CutWhenAnimationEnds()
@@ -88,10 +92,8 @@ public class Cut : MonoBehaviour
         balance1.weightValue = leftMass;
         balance2.weightValue = rightMass;
 
-        yield return new WaitForSeconds(1f);
-
         int percentLeftValue = leftMass * 100 / (leftMass + rightMass);
-        int percentRightValue = rightMass * 100 / (leftMass + rightMass);
+        int percentRightValue = 100 - percentLeftValue;
 
         percentLeft.hideValue = false;
         percentRight.hideValue = false;
@@ -99,6 +101,8 @@ public class Cut : MonoBehaviour
         percentRight.numberValue = percentRightValue;
         percentLeft.StartAnimation();
         percentRight.StartAnimation();
+
+        yield return new WaitForSeconds(2.5f);
 
         FindAnyObjectByType<GameManager>().CalculateScore(percentLeftValue, percentRightValue, leftMass, rightMass);
 
@@ -109,7 +113,11 @@ public class Cut : MonoBehaviour
         animator.SetBool("Cutting", false);
     }
 
-    void ShakeScreen(){
+    void ShakeScreen()
+    {
+        var audioSource = GetComponent<AudioSource>();
+        audioSource.clip = impactSound;
+        audioSource.Play();
         CameraShake.Instance.BigShake();
     }
 

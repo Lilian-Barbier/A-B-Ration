@@ -5,13 +5,20 @@ public class HandMovement : MonoBehaviour
     [SerializeField] private float speed = 1.0f;
 
     private bool isMoving = false;
+    private AudioSource audioSource;
 
     void Start()
     {
-        InputManager.Instance.inputActions.Actions.A.performed += ctx => isMoving = true;
+        audioSource = GetComponent<AudioSource>();
+        InputManager.Instance.inputActions.Actions.A.performed += ctx =>
+        {
+            isMoving = true;
+            audioSource.Play();
+        };
         InputManager.Instance.inputActions.Actions.A.canceled += ctx =>
         {
             isMoving = false;
+            audioSource.Stop();
             speed *= -1;
         };
     }

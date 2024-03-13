@@ -2,13 +2,14 @@ using UnityEngine;
 using TMPro;
 public class NumberValueAnimationUI : MonoBehaviour
 {
-    public int currentValue = 0;
+    public int startValue = 0;
     public int numberValue = 0;
     public int duration = 2;
 
     public bool animationColor = true;
     public bool animationFontSize = true;
     public bool animationWobble = true;
+    public bool playAudio = false;
 
     public int numberValueMax = 100;
 
@@ -16,16 +17,26 @@ public class NumberValueAnimationUI : MonoBehaviour
 
     public TextMeshProUGUI valueText;
 
+    int lastNumberValue;
+
+    private AudioSource audioSource;
+
     public string prefix = "+";
     public string suffix = "";
 
     // Start is called before the first frame update
     void Start()
     {
+        if (playAudio)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
         valueText = GetComponent<TextMeshProUGUI>();
+        lastNumberValue = numberValue;
     }
 
-    public void StartAnimation(){
+    public void StartAnimation()
+    {
         Animation anim = GetComponent<Animation>();
         AnimationCurve curve;
 
@@ -35,12 +46,13 @@ public class NumberValueAnimationUI : MonoBehaviour
             legacy = true
         };
 
-        curve = AnimationCurve.EaseInOut(0, currentValue, duration, numberValue);
+        curve = AnimationCurve.EaseInOut(0, startValue, duration, numberValue);
         clip.SetCurve("", typeof(NumberValueAnimationUI), "numberValue", curve);
 
-        if(animationColor){
+        if (animationColor)
+        {
             float maxRedValue = 2f;
-            float minRedValue = 0.58f;
+            float minRedValue = 0.2313726f;
             float targetRedValue = maxRedValue * numberValue / numberValueMax;
             targetRedValue = Mathf.Clamp(targetRedValue, minRedValue, maxRedValue);
 
@@ -48,17 +60,19 @@ public class NumberValueAnimationUI : MonoBehaviour
             clip.SetCurve("", typeof(TextMeshProUGUI), "m_fontColor.r", curve);
         }
 
-        if(animationFontSize){
+        if (animationFontSize)
+        {
             float maxFontSize = 200f;
             float minFontSize = 90f;
             float targetFontValue = maxFontSize * numberValue / numberValueMax;
             targetFontValue = Mathf.Clamp(targetFontValue, minFontSize, maxFontSize);
 
             curve = AnimationCurve.EaseInOut(0, minFontSize, duration, targetFontValue);
-            clip.SetCurve("", typeof(TextMeshProUGUI), "m_fontSize", curve);     
+            clip.SetCurve("", typeof(TextMeshProUGUI), "m_fontSize", curve);
         }
 
-        if(animationWobble){
+        if (animationWobble)
+        {
             float maxWobbleHeight = 7f;
             float minWobbleHeight = 0f;
             float targetWobbleValue = maxWobbleHeight * numberValue / numberValueMax;
@@ -76,10 +90,18 @@ public class NumberValueAnimationUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(hideValue){
+        if (hideValue)
+        {
             valueText.text = "";
             return;
         }
+
         valueText.text = prefix + numberValue.ToString() + suffix;
+
+        if (playAudio && !audioSource.isPlaying && lastNumberValue != numberValue)
+        {
+            audioSource.Play();
+            lastNumberValue = numberValue;
+        }
     }
 }

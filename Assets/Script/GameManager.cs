@@ -16,17 +16,21 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private int scoreMaxWithoutPercentDifference = 100;
     [SerializeField] private int maxPercentDifference = 10;
-    [SerializeField] private int scoreWhenSamePercent = 150;
-    [SerializeField] private int scoreWhenSameMass = 300;
+    [SerializeField] private int scoreWhenSamePercent = 100;
+    [SerializeField] private int scoreWhenSameMass = 200;
     [SerializeField] private int partLeftPercentRatio = 50;
 
     [SerializeField] TextMeshProUGUI scoreText;
-    [SerializeField] TextMeshProUGUI ratioLeftText;
-    [SerializeField] TextMeshProUGUI ratioRightText;
+    [SerializeField] NumberValueAnimationUI ratioLeftText;
+    [SerializeField] NumberValueAnimationUI ratioRightText;
 
-    
+
     [SerializeField] TextMeshProUGUI ratioGapText;
     [SerializeField] NumberValueAnimationUI ratioGapScore;
+    [SerializeField] NumberValueAnimationUI perfectCutScore;
+    [SerializeField] NumberValueAnimationUI extraPerfectCutScore;
+
+    [SerializeField] Animator GlobalVolumeAnimator;
 
     private int currentLevelIndex = 1;
 
@@ -61,21 +65,32 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(WaitAnimation());
             }
         };
-        UpdateUI();
+        UpdateUI(false);
     }
 
-    void UpdateUI(){
+    void UpdateUI(bool startAnimation = true)
+    {
         scoreText.text = currentScore.ToString();
-        ratioLeftText.text = partLeftPercentRatio.ToString() + "%";
-        ratioRightText.text = (100 - partLeftPercentRatio).ToString() + "%";
+        ratioLeftText.startValue = ratioLeftText.numberValue;
+        ratioRightText.startValue = ratioRightText.numberValue;
+        ratioLeftText.numberValue = partLeftPercentRatio;
+        ratioRightText.numberValue = 100 - partLeftPercentRatio;
+        if (startAnimation)
+        {
+            ratioLeftText.StartAnimation();
+            ratioRightText.StartAnimation();
+        }
     }
 
     public void CalculateScore(int percentLeft, int percentRight, int massLeft, int massRight)
     {
+        //Set Blur
+        GlobalVolumeAnimator.SetBool("Blur", true);
+
         int differenceFromLeftRatio = Mathf.Abs(percentLeft - partLeftPercentRatio);
 
         ratioGapText.text = differenceFromLeftRatio.ToString() + "%";
-        
+
         int scoreByDifferenceFromLeftRatio = (int)Mathf.Lerp(scoreMaxWithoutPercentDifference, 0, (float)differenceFromLeftRatio / maxPercentDifference);
         ratioGapScore.numberValue = scoreByDifferenceFromLeftRatio;
         ratioGapScore.StartAnimation();
@@ -83,34 +98,46 @@ public class GameManager : MonoBehaviour
 
         ratioGapText.GetComponentInParent<CanvasGroup>().alpha = 1;
 
-        // if (difference <= maxPercentDifference)
-        // {
-        //     //Todo : a revoir pour adapter le score selon la masse de l'objet / la difficulté
-        //     var scoreByPercentDifference = (int)Mathf.Lerp(scoreMaxWithoutPercentDifference, 0, difference / maxPercentDifference);
-        //     currentScore += scoreByPercentDifference;
+        if (percentLeft == partLeftPercentRatio)
+        {
+            perfectCutScore.numberValue = scoreWhenSamePercent;
+            perfectCutScore.StartAnimation();
+            currentScore += scoreWhenSamePercent;
 
-        //     if (percentLeft == percentRight)
-        //     {
-        //         currentScore += scoreWhenSamePercent;
-        //     }
-        //     else if (massLeft == massRight)
-        //     {
-        //         currentScore += scoreWhenSameMass;
-        //     }
-        // }
+            perfectCutScore.GetComponentInParent<CanvasGroup>().alpha = 1;
+
+            int totalMass = massLeft + massRight;
+            int extraPerfectCutExpectedValue = totalMass * partLeftPercentRatio / 100;
+            Debug.Log("extraPerfectCutExpectedValue: " + extraPerfectCutExpectedValue);
+            if (massLeft == extraPerfectCutExpectedValue)
+            {
+                extraPerfectCutScore.numberValue = scoreWhenSameMass;
+                extraPerfectCutScore.StartAnimation();
+                currentScore += scoreWhenSameMass;
+
+                extraPerfectCutScore.GetComponentInParent<CanvasGroup>().alpha = 1;
+            }
+        }
+
         UpdateUI();
     }
 
     IEnumerator WaitAnimation()
     {
+        //unset Blur
+        GlobalVolumeAnimator.SetBool("Blur", false);
+
         //A revoir, trop de dépandance entre les classes
         FindAnyObjectByType<Cut>().Reset();
 
         ratioGapText.GetComponentInParent<CanvasGroup>().alpha = 0;
+        perfectCutScore.GetComponentInParent<CanvasGroup>().alpha = 0;
+        extraPerfectCutScore.GetComponentInParent<CanvasGroup>().alpha = 0;
 
         //Update difficulty 
         currentLevelIndex++;
-        if(currentLevelIndex > 2){
+        if (currentLevelIndex > 2)
+        {
             partLeftPercentRatio = Random.Range(1, 10) * 10;
         }
 
