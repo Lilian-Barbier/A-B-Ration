@@ -16,35 +16,42 @@ public class Cut : MonoBehaviour
     [SerializeField] private TextMeshProUGUI percentLeft;
     [SerializeField] private TextMeshProUGUI percentRight;
 
+    [SerializeField] private PlayableDirector directorScore;
+
     private int leftMass;
     private int rightMass;
 
     void Start()
     {
-        percentLeft.text = "";
-        percentRight.text = "";
-        partLeft.enabled = false;
-        partRight.enabled = false;
+        Reset();
         InputManager.Instance.inputActions.Actions.B.performed += ctx =>
         {
-            if (!InputManager.Instance.alreadyCut)
+            if (InputManager.Instance.currentState != InputManager.States.Cutting)
             {
-                InputManager.Instance.alreadyCut = true;
                 Cuting();
             }
         };
     }
 
+    public void Reset()
+    {
+        percentLeft.text = "";
+        percentRight.text = "";
+        partLeft.enabled = false;
+        partRight.enabled = false;
+    }
+
     void Cuting()
     {
         var animator = GetComponent<Animator>();
-        animator.SetTrigger("Cut");
+        animator.SetTrigger("Cutting");
 
         GameObject cuttableObject = GameObject.FindWithTag("Cuttable");
 
-        var cuttableCollider = cuttableObject.GetComponent<EdgeCollider2D>();
-        if (cuttableCollider.bounds.Contains(cuttingPoint.position))
+        var spriteRenderer = cuttableObject.GetComponent<SpriteRenderer>();
+        if (spriteRenderer.bounds.Contains(cuttingPoint.position))
         {
+            InputManager.Instance.currentState = InputManager.States.Cutting;
             int[] mass = cuttableObject.GetComponent<Cuttable>().Cut(cuttingPoint.position, partLeft, partRight);
             leftMass = mass[0];
             rightMass = mass[1];
@@ -55,10 +62,9 @@ public class Cut : MonoBehaviour
     IEnumerator StartAnimation()
     {
         yield return new WaitForSeconds(timeWaitingAnimation);
-        PlayableDirector director = FindAnyObjectByType<PlayableDirector>();
-        director.Play();
+        directorScore.Play();
 
-        yield return new WaitForSeconds((float)director.duration + 0.1f);
+        yield return new WaitForSeconds((float)directorScore.duration + 0.1f);
 
         for (int i = 10; i > 0; i--)
         {
@@ -77,6 +83,12 @@ public class Cut : MonoBehaviour
 
         percentLeft.text = (leftMass * 100 / (leftMass + rightMass)).ToString() + "%";
         percentRight.text = (rightMass * 100 / (leftMass + rightMass)).ToString() + "%";
+
+        InputManager.Instance.currentState = InputManager.States.WaitingForNexLevel;
+
+        //Reset animation
+        var animator = GetComponent<Animator>();
+        animator.SetBool("Cutting", false);
     }
 
 }

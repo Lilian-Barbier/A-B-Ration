@@ -5,7 +5,14 @@ public class InputManager : Singleton<InputManager>
 {
     public Controls inputActions;
 
-    public bool alreadyCut = false;
+    public enum States
+    {
+        WaitingForCut,
+        Cutting,
+        WaitingForNexLevel
+    }
+
+    public States currentState = States.WaitingForCut;
 
     void Awake()
     {

@@ -18,7 +18,7 @@ public class HandMovement : MonoBehaviour
 
     void Update()
     {
-        if (isMoving && !InputManager.Instance.alreadyCut)
+        if (isMoving && InputManager.Instance.currentState == InputManager.States.WaitingForCut)
         {
             transform.position += speed * Time.deltaTime * Vector3.right;
         }
