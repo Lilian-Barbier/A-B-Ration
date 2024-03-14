@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class InputManager : Singleton<InputManager>
+public class InputManager : MonoBehaviour
 {
     public Controls inputActions;
 
@@ -10,7 +10,8 @@ public class InputManager : Singleton<InputManager>
         WaitingForCut,
         Cutting,
         WaitingInputToLoadNextLevel,
-        WaitingAnimationNextLevel
+        WaitingAnimationNextLevel,
+        WaitingInputToRestart
     }
 
     public States currentState = States.WaitingForCut;

@@ -3,29 +3,54 @@ using UnityEngine;
 public class HandMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 1.0f;
-
+    public bool canMove = true;
     private bool isMoving = false;
     private AudioSource audioSource;
+    Animator animator;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        InputManager.Instance.inputActions.Actions.A.performed += ctx =>
+        animator = GetComponent<Animator>();
+
+        FindAnyObjectByType<InputManager>().inputActions.Actions.A.performed += ctx =>
         {
-            isMoving = true;
-            audioSource.Play();
+            if (canMove)
+            {
+                isMoving = true;
+                audioSource.Play();
+            }
         };
-        InputManager.Instance.inputActions.Actions.A.canceled += ctx =>
+        FindAnyObjectByType<InputManager>().inputActions.Actions.A.canceled += ctx =>
         {
-            isMoving = false;
-            audioSource.Stop();
-            speed *= -1;
+            if (canMove)
+            {
+                isMoving = false;
+                audioSource.Stop();
+                speed *= -1;
+            }
+        };
+
+        FindAnyObjectByType<InputManager>().inputActions.Actions.B.performed += ctx =>
+        {
+            if (FindAnyObjectByType<InputManager>().currentState != InputManager.States.Cutting && canMove)
+            {
+                animator.SetBool("Cutting", true);
+            }
+        };
+
+        FindAnyObjectByType<InputManager>().inputActions.Actions.B.canceled += ctx =>
+        {
+            if (canMove)
+            {
+                animator.SetBool("Cutting", false);
+            }
         };
     }
 
     void Update()
     {
-        if (isMoving && InputManager.Instance.currentState == InputManager.States.WaitingForCut)
+        if (isMoving && FindAnyObjectByType<InputManager>().currentState == InputManager.States.WaitingForCut)
         {
             transform.position += speed * Time.deltaTime * Vector3.right;
         }

@@ -24,7 +24,7 @@ public class BlurOverideValue : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        depthOfField.focusDistance.Override(blurValue);
+        depthOfField.focalLength.Override(blurValue);
         lensDistortion.intensity.Override(lensDistortionValue);
     }
 }

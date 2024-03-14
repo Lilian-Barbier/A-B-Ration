@@ -71,6 +71,17 @@
                 },
                 {
                     "name": "",
+                    "id": "051b5328-745a-4f01-bb87-c0bd0081fe37",
+                    "path": "<WebGLGamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "A",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "049edbe9-a18f-42a8-8f64-fc04277ff2de",
                     "path": "<Keyboard>/#(B)",
                     "interactions": "",
@@ -106,6 +117,17 @@
                     "name": "",
                     "id": "11542c67-ebf2-48ea-abc2-5a3e6c3d4d5d",
                     "path": "<DualShockGamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "B",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "af44fad4-4850-4382-b161-953db717d835",
+                    "path": "<WebGLGamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

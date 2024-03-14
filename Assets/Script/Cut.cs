@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Playables;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Cut : MonoBehaviour
 {
@@ -20,25 +21,31 @@ public class Cut : MonoBehaviour
     [SerializeField] private AudioClip prepareCuttingSound;
     [SerializeField] private AudioClip impactSound;
 
+    [SerializeField] private bool titleScreen = false;
+    [SerializeField] private bool canCut = true;
+
     private int leftMass;
     private int rightMass;
 
     void Start()
     {
-        Reset();
-        InputManager.Instance.inputActions.Actions.B.performed += ctx =>
+        if (!titleScreen)
         {
-            if (InputManager.Instance.currentState != InputManager.States.Cutting)
+            Reset();
+        }
+        FindAnyObjectByType<InputManager>().inputActions.Actions.B.performed += ctx =>
+        {
+            if (FindAnyObjectByType<InputManager>().currentState != InputManager.States.Cutting && canCut)
             {
-                GetComponent<Animator>().SetTrigger("PrepareCutting");
+                GetComponent<Animator>().SetBool("Cutting", true);
                 var audioSource = GetComponent<AudioSource>();
                 audioSource.clip = prepareCuttingSound;
                 audioSource.Play();
             }
         };
-        InputManager.Instance.inputActions.Actions.B.canceled += ctx =>
+        FindAnyObjectByType<InputManager>().inputActions.Actions.B.canceled += ctx =>
         {
-            if (InputManager.Instance.currentState != InputManager.States.Cutting)
+            if (FindAnyObjectByType<InputManager>().currentState != InputManager.States.Cutting)
             {
                 Cuting();
             }
@@ -55,7 +62,7 @@ public class Cut : MonoBehaviour
 
     void Cuting()
     {
-        GetComponent<Animator>().SetTrigger("Cutting");
+        GetComponent<Animator>().SetBool("Cutting", false);
     }
 
     void CutWhenAnimationEnds()
@@ -65,10 +72,16 @@ public class Cut : MonoBehaviour
         var spriteRenderer = cuttableObject.GetComponent<SpriteRenderer>();
         if (spriteRenderer.bounds.Contains(cuttingPoint.position))
         {
-            InputManager.Instance.currentState = InputManager.States.Cutting;
+            FindAnyObjectByType<InputManager>().currentState = InputManager.States.Cutting;
             int[] mass = cuttableObject.GetComponent<Cuttable>().Cut(cuttingPoint.position, partLeft, partRight);
             leftMass = mass[0];
             rightMass = mass[1];
+
+            if (!titleScreen)
+            {
+                FindAnyObjectByType<GameManager>().InstantiateSandwichPart(partLeft.sprite, partRight.sprite);
+            }
+
             StartCoroutine(StartAnimation());
         }
     }
@@ -78,6 +91,12 @@ public class Cut : MonoBehaviour
         directorScore.Play();
 
         yield return new WaitForSeconds((float)directorScore.duration + 0.1f);
+
+        if (titleScreen)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            yield break;
+        }
 
         for (int i = 10; i > 0; i--)
         {
@@ -105,8 +124,6 @@ public class Cut : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
 
         FindAnyObjectByType<GameManager>().CalculateScore(percentLeftValue, percentRightValue, leftMass, rightMass);
-
-        InputManager.Instance.currentState = InputManager.States.WaitingInputToLoadNextLevel;
 
         //Reset animation
         var animator = GetComponent<Animator>();
