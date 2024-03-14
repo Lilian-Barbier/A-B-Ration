@@ -1,18 +1,15 @@
-Digital Font : https://www.dafont.com/fr/e1234.font
-Catboo Font : https://www.dafont.com/fr/catboo.Font
-Fredoka One Font : https://github.com/hafontia-zz/Fredoka-One#OFL-1.1-1-ov-file
+Credits
 
+FONT :  
+    E1234 : https://www.dafont.com/fr/e1234.font
+    Fredoka One : https://github.com/hafontia-zz/Fredoka-One#OFL-1.1-1-ov-file
 
-Audio : 
-Impact : https://freesound.org/people/Sophia_C/sounds/525181/
-Knife : https://freesound.org/people/Anthousai/sounds/336589/
-Knife Stab : https://freesound.org/people/Aris621/sounds/478145/
-https://freesound.org/people/hillsideflashes/sounds/721539/
-https://freesound.org/people/josefpres/sounds/726849/
-Clic 1 : https://freesound.org/people/Jaszunio15/sounds/421470/
-Clic 2 : https://freesound.org/people/Jaszunio15/sounds/421462/
-Game ui sound : https://pixabay.com/fr/sound-effects/game-ui-sounds-14857/
-Interface sound : https://www.kenney.nl/assets/interface-sounds
-Rub Sound effect  : https://pixabay.com/fr/sound-effects/rubbing-palms-40810/
+Sound Effect : 
+    Knife sharpen - by Anthousai : https://freesound.org/people/Anthousai/sounds/336589/
+    Knife Stab - by Aris621 : https://freesound.org/people/Aris621/sounds/478145/
+    Clic 1 - by Jaszunio15 : https://freesound.org/people/Jaszunio15/sounds/421470/
+    Clic 2 - by Jaszunio15 :  https://freesound.org/people/Jaszunio15/sounds/421462/
+    Rub Sound effect : https://pixabay.com/fr/sound-effects/rubbing-palms-40810/
+
 Music : 
-Music by Noru from Pixabay : https://pixabay.com/fr/music/jazz-traditionnel-wavering-slow-jazz-piano-176511/
+    Jazz Piano - by Noru : https://pixabay.com/fr/music/jazz-traditionnel-wavering-slow-jazz-piano-176511/
