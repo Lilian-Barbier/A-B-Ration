@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class TextureSlice : MonoBehaviour
@@ -34,14 +35,16 @@ public class TextureSlice : MonoBehaviour
         spriteBounds.center = transform.position;
 
         if(Input.GetKeyDown(KeyCode.Space)){
-            Cut();
+            StartCoroutine(Cut());
         }
     }
 
-    void Cut(){
+    Vector3 drawSpherePosition;
+
+    IEnumerator Cut(){
 
         //Vérification de si la ligne de coupe est sur le sprite
-        if(!cutLineBounds.Intersects(spriteBounds)) return;
+        if(!cutLineBounds.Intersects(spriteBounds)) yield break;
 
         Texture2D texture = sprite.texture;
 
@@ -55,10 +58,17 @@ public class TextureSlice : MonoBehaviour
             for (int x = 0; x < texture.width; x++)
             {
                 //on vérifie si on n'a pas encore atteint le sprite de la découpe, si on l'atteint on casse la boucle
+                
+                //Fonctionne pas
                 Vector3 pixelWorldPosition = new Vector3(x, y, 0) + transform.position - new Vector3(spriteBounds.extents.x, spriteBounds.extents.y, 0);
                 if(cutLineBounds.Contains(pixelWorldPosition)){
                     break;
                 }
+                
+                //Draw gizmos
+                drawSpherePosition = pixelWorldPosition;
+                yield return new WaitForSeconds(0.1f);
+
 
                 Color pixel = texture.GetPixel(x, y);
                 leftTexture.SetPixel(x, y, pixel);
@@ -85,5 +95,8 @@ public class TextureSlice : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, spriteBounds.size);
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(cutLine.transform.position, cutLineBounds.size);
+        
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(drawSpherePosition, 0.1f);
     }
 }
