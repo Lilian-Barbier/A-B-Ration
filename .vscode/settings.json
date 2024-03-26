@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "A+B=Ration.sln"
+    "dotnet.defaultSolution": "A-B-Ration.sln"
 }
